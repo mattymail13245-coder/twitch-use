@@ -7,6 +7,7 @@
         body {
             background: transparent;
             margin: 0;
+            padding: 20px;
             overflow: hidden;
             display: flex;
             align-items: center;
@@ -16,42 +17,81 @@
         .goal-wrapper {
             color: white;
             font-size: 60px;
-            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+            text-shadow: 3px 3px 10px rgba(0,0,0,0.9);
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.2); /* Leichtes Background-Panel für bessere Lesbarkeit */
+            padding: 10px 20px;
+            border-radius: 15px;
         }
 
-        .current { color: #00FFCC; } /* Deine Wunschfarbe für die aktuelle Zahl */
-        .divider { opacity: 0.5; margin: 0 10px; }
-        .total { color: #ffffff; }
+        .current { 
+            color: #00FFCC; 
+            transition: all 0.5s ease;
+        }
+
+        .divider { 
+            opacity: 0.6; 
+            margin: 0 15px; 
+            font-weight: 300;
+        }
+
+        .total { 
+            color: #ffffff; 
+        }
+
+        /* Kleiner Effekt, wenn die Zahl sich ändert */
+        .pulse {
+            animation: pulse-animation 0.5s ease-out;
+        }
+
+        @keyframes pulse-animation {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); color: #fff; }
+            100% { transform: scale(1); }
+        }
     </style>
 </head>
 <body>
 
     <div class="goal-wrapper">
-        <span id="current">0</span>
+        <span id="current" class="current">0</span>
         <span class="divider">/</span>
-        <span id="total">100</span>
+        <span id="total" class="total">100</span>
     </div>
 
     <script>
-        // Hier deinen Twitch Namen eintragen
-        const twitchUser = 'Nyroox'; 
+        // Name wurde auf nyoorx angepasst
+        const twitchUser = 'nyoorx'; 
         const goalAmount = 100;
+        let lastCount = 0;
 
         async function updateFollowers() {
             try {
-                // Nutzt die öffentliche API von Decapi oder StreamElements
+                // Nutzt Decapi für den Follower-Count
                 const response = await fetch(`https://decapi.me/twitch/followcount/${twitchUser}`);
-                const count = await response.text();
+                if (!response.ok) throw new Error('Netzwerk-Fehler');
                 
-                document.getElementById('current').innerText = count;
+                const count = await response.text();
+                const currentElem = document.getElementById('current');
+                
+                // Animation abspielen, wenn sich die Zahl ändert
+                if (count !== lastCount) {
+                    currentElem.classList.remove('pulse');
+                    void currentElem.offsetWidth; // Trigger Reflow
+                    currentElem.classList.add('pulse');
+                    lastCount = count;
+                }
+
+                currentElem.innerText = count.trim();
                 document.getElementById('total').innerText = goalAmount;
             } catch (e) {
-                console.log("Fehler beim Laden:", e);
+                console.log("Fehler beim Laden der Follower:", e);
             }
         }
 
-        // Alle 30 Sekunden aktualisieren
-        setInterval(updateFollowers, 30000);
+        // Alle 20 Sekunden aktualisieren (etwas schneller als vorher)
+        setInterval(updateFollowers, 20000);
         updateFollowers();
     </script>
 </body>
