@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@900&display=swap');
+        
+        body {
+            background: transparent;
+            margin: 0;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .goal-wrapper {
+            color: white;
+            font-size: 60px;
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.8);
+        }
+
+        .current { color: #00FFCC; } /* Deine Wunschfarbe für die aktuelle Zahl */
+        .divider { opacity: 0.5; margin: 0 10px; }
+        .total { color: #ffffff; }
+    </style>
+</head>
+<body>
+
+    <div class="goal-wrapper">
+        <span id="current">0</span>
+        <span class="divider">/</span>
+        <span id="total">100</span>
+    </div>
+
+    <script>
+        // Hier deinen Twitch Namen eintragen
+        const twitchUser = 'Nyroox'; 
+        const goalAmount = 100;
+
+        async function updateFollowers() {
+            try {
+                // Nutzt die öffentliche API von Decapi oder StreamElements
+                const response = await fetch(`https://decapi.me/twitch/followcount/${twitchUser}`);
+                const count = await response.text();
+                
+                document.getElementById('current').innerText = count;
+                document.getElementById('total').innerText = goalAmount;
+            } catch (e) {
+                console.log("Fehler beim Laden:", e);
+            }
+        }
+
+        // Alle 30 Sekunden aktualisieren
+        setInterval(updateFollowers, 30000);
+        updateFollowers();
+    </script>
+</body>
+</html>
